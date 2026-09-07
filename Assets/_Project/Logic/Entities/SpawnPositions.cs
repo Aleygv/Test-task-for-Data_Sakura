@@ -2,7 +2,7 @@ using System.Collections.Generic;
 using _Project.Logic.Extensions;
 using UnityEngine;
 
-namespace _Project.Logic.Services
+namespace _Project.Logic.Entities
 {
     public static class SpawnPositions
     {

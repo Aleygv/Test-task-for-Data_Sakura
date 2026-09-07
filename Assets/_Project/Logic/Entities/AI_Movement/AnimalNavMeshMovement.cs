@@ -1,6 +1,3 @@
-using System;
-using _Project.Logic.Extensions;
-using _Project.Logic.Services;
 using UnityEngine;
 using UnityEngine.AI;
 using Random = UnityEngine.Random;

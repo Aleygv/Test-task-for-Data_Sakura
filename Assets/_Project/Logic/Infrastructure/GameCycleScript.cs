@@ -3,10 +3,9 @@ using System.Threading;
 using _Project.Logic.Services;
 using Cysharp.Threading.Tasks;
 using UnityEngine;
-using UnityEngine.Serialization;
 using Zenject;
 
-namespace _Project.Logic.Entities
+namespace _Project.Logic.Infrastructure
 {
     public class GameCycleScript : MonoBehaviour
     {
