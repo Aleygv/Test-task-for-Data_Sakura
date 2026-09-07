@@ -148,7 +148,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 4746283f7cac495f83a33d51525cf98d, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::_Project.Logic.Entities.GameCycleScript
-  spawnInterval: 2
+  spawnInterval: 3
 --- !u!4 &6639589
 Transform:
   m_ObjectHideFlags: 0

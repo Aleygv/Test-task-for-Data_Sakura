@@ -4,29 +4,16 @@ using UnityEngine;
 
 namespace _Project.Logic.Entities.Animals.Preyes
 {
-    public class Frog : IAnimal
+    public class Frog : AnimalBase
     {
-        public Guid Id { get; }
-        public AnimalRole Role { get; }
-        public LightVector3 Position { get; set; }
-        public event Action OnDie;
-
-        public Frog(Guid id, LightVector3 position)
+        public Frog(Guid id, LightVector3 position) : base(id, AnimalRole.Prey, position)
         {
-            Id = id;
-            Role = AnimalRole.Prey;
-            Position = position;
         }
 
-        public void Die()
+        public override void Bounce(LightVector3 pos)
         {
-            OnDie?.Invoke();
-            Debug.Log($"Лягух с Id {Id} съеден");
-        }
-
-        public void Bounce(LightVector3 fromPosition)
-        {
-            Debug.Log($"Лягух оттолкнулся на {Position.x} метров");
+            base.Bounce(pos);
+            Debug.Log($"Лягух отскочил!");
         }
     }
 }

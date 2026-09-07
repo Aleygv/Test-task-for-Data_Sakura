@@ -9,9 +9,9 @@ namespace _Project.Logic.Entities
         AnimalRole Role { get; }
         LightVector3 Position { get; set; }
         event Action OnDie;
-
+        event Action<LightVector3> OnBounce; 
         void Die();
-        void Bounce(LightVector3 fromPosition);
+        void Bounce(LightVector3 position);
     }
 
     public enum AnimalRole

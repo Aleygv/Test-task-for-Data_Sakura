@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using _Project.Logic.Entities;
+using _Project.Logic.Entities.Animals.Preyes;
 using Random = UnityEngine.Random;
 
 namespace _Project.Logic.Services
