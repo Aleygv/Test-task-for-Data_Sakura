@@ -1,5 +1,8 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.Linq;
 using _Project.Logic.Entities;
+using _Project.Logic.Entities.Animals;
 using _Project.Logic.Entities.Animals.Predators;
 using _Project.Logic.Entities.Animals.Preyes;
 using _Project.Logic.Extensions;
@@ -19,38 +22,47 @@ namespace _Project.Logic.Services
         private IAnimalCollisionResolver _collisionResolver;
         private IAnimalRegistry _registry;
 
+        private readonly List<AnimalConfig> _animalConfigs;
+
         [Inject]
         public AnimalFabric(IAssets assets, IAnimalCollisionResolver collisionResolver, IAnimalRegistry registry)
         {
             _assets = assets;
             _collisionResolver = collisionResolver;
             _registry = registry;
+
+            _animalConfigs = new List<AnimalConfig>
+            {
+                new(FrogPath, AnimalRole.Prey, (id, pos) => new Frog(id, pos)),
+                new(SnakePath, AnimalRole.Predator, (id, pos) => new Snake(id, pos))
+            };
         }
 
-        public async UniTask<GameObject> SpawnFrog()
+        public async UniTask<GameObject> SpawnByConfig(AnimalConfig config)
         {
-            GameObject frogPrefab = await _assets.Instantiate(FrogPath);
-            IAnimal frog = new Frog(Guid.NewGuid(), SpawnPositions.GetRandomPosition());
-            
-            _registry.Register(frog);
-            
-            frogPrefab.GetComponent<AnimalReference>().Initialize(frog);
-            frogPrefab.GetComponent<AnimalReference>().OnAnimalCollided += _collisionResolver.Resolve;
-            frogPrefab.transform.position = frog.Position.AsUnityVector();
-            return frogPrefab;
+            GameObject prefab = await _assets.Instantiate(config.PrefabPath);
+            IAnimal animal = config.Factory.Invoke(Guid.NewGuid(), SpawnPositions.GetRandomPosition());
+
+            _registry.Register(animal);
+
+            AnimalReference animalReference = prefab.GetComponent<AnimalReference>();
+            animalReference.Initialize(animal);
+            animalReference.OnAnimalCollided += _collisionResolver.Resolve;
+            prefab.transform.position = animal.Position.AsUnityVector();
+            return prefab;            
         }
 
-        public async UniTask<GameObject> SpawnSnake()
+        public UniTask<GameObject> SpawnRandomAnimal()
         {
-            GameObject snakePrefab = await _assets.Instantiate(SnakePath);
-            IAnimal snake = new Snake(Guid.NewGuid(), SpawnPositions.GetRandomPosition());
-            
-            _registry.Register(snake);
-            
-            snakePrefab.GetComponent<AnimalReference>().Initialize(snake);
-            snakePrefab.GetComponent<AnimalReference>().OnAnimalCollided += _collisionResolver.Resolve;
-            snakePrefab.transform.position = snake.Position.AsUnityVector();
-            return snakePrefab;
+            int range = Random.Range(0, _animalConfigs.Count);
+            return SpawnByConfig(_animalConfigs[range]);
+        }
+
+        public UniTask<GameObject> SpawnRandomByRole(AnimalRole role)
+        {
+            List<AnimalConfig> roleConfigs = _animalConfigs.Where(c => c.Role == role).ToList();
+            var randomConfig = roleConfigs[Random.Range(0, roleConfigs.Count)];
+            return SpawnByConfig(randomConfig);
         }
     }
 }

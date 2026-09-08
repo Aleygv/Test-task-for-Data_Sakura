@@ -4,6 +4,7 @@ using _Project.Logic.Services;
 using Cysharp.Threading.Tasks;
 using UnityEngine;
 using Zenject;
+using Random = UnityEngine.Random;
 
 namespace _Project.Logic.Infrastructure
 {
@@ -11,6 +12,8 @@ namespace _Project.Logic.Infrastructure
     {
         [SerializeField] private float spawnInterval = 2f;
         private IAnimalFabric _animalFabric;
+        
+        private float _timeCounter;
 
         [Inject]
         public void Construct(IAnimalFabric animalFabric)
@@ -27,13 +30,13 @@ namespace _Project.Logic.Infrastructure
         {
             while (!ct.IsCancellationRequested)
             {
-                await UniTask.Delay(TimeSpan.FromSeconds(spawnInterval), DelayType.DeltaTime,
-                    PlayerLoopTiming.Update, ct);
-                
-                await UniTask.WhenAll(
-                    _animalFabric.SpawnFrog(),
-                    _animalFabric.SpawnSnake());
+                float delay = Random.Range(1f, spawnInterval);
+
+                await UniTask.Delay(TimeSpan.FromSeconds(delay), DelayType.DeltaTime, PlayerLoopTiming.Update, ct);
+
+                await _animalFabric.SpawnRandomAnimal();
             }
         }
+
     }
 }
