@@ -20,13 +20,10 @@ namespace _Project.Logic.UI_Logic
         {
             _viewCounter = viewCounter;
             
-            _registry.OnAnimalCountChanged += OnCountChanged;
-            
-            _viewCounter.UpdatePreyCounter(_registry.GetCount(AnimalRole.Prey));
-            _viewCounter.UpdatePredatorCounter(_registry.GetCount(AnimalRole.Predator));
+            _registry.OnAnimalDied += OnDied;
         }
 
-        private void OnCountChanged(AnimalRole role, int amount)
+        private void OnDied(AnimalRole role, int amount)
         {
             if (role == AnimalRole.Prey) _viewCounter.UpdatePreyCounter(amount);
             if (role == AnimalRole.Predator) _viewCounter.UpdatePredatorCounter(amount);
@@ -34,7 +31,7 @@ namespace _Project.Logic.UI_Logic
 
         public void Dispose()
         {
-            _registry.OnAnimalCountChanged -= OnCountChanged;
+            _registry.OnAnimalDied -= OnDied;
         }
     }
 }
