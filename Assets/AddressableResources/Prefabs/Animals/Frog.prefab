@@ -15,7 +15,7 @@ GameObject:
   - component: {fileID: 4235341724369196584}
   - component: {fileID: 6344812663065047910}
   - component: {fileID: -4373876197271840574}
-  - component: {fileID: -5603940925851761021}
+  - component: {fileID: 8663324986241199800}
   m_Layer: 0
   m_Name: Frog
   m_TagString: Untagged
@@ -177,7 +177,7 @@ NavMeshAgent:
   m_BaseOffset: 0.5
   m_WalkableMask: 4294967295
   m_ObstacleAvoidanceType: 4
---- !u!114 &-5603940925851761021
+--- !u!114 &8663324986241199800
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -186,11 +186,11 @@ MonoBehaviour:
   m_GameObject: {fileID: 4960518193866401001}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 88e3d04713f8d0a418ddae38f7d0c919, type: 3}
+  m_Script: {fileID: 11500000, guid: 78174ce9ae6547869b58ac558174ffe8, type: 3}
   m_Name: 
-  m_EditorClassIdentifier: '::'
+  m_EditorClassIdentifier: Assembly-CSharp::_Project.Logic.Entities.AI_Movement.JumpMovement
   agent: {fileID: -4373876197271840574}
   minDistance: 3
   maxDistance: 7
   minWaitTime: 0.5
-  maxWaitTime: 1
+  maxWaitTime: 2

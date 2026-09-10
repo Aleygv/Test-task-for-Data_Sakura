@@ -11,7 +11,7 @@ namespace _Project.Logic.Entities
 
         public IAnimal Animal { get; private set; }
 
-        private AnimalNavMeshMovement _meshMovement;
+        private AnimalMovementBase _meshMovementBase;
 
         public void Initialize(IAnimal animal)
         {
@@ -19,12 +19,12 @@ namespace _Project.Logic.Entities
             Animal.OnDie += OnAnimalDied;
             Animal.OnBounce += HandleBounce;
             
-            _meshMovement = GetComponent<AnimalNavMeshMovement>();
+            _meshMovementBase = GetComponent<AnimalMovementBase>();
         }
 
         private void HandleBounce(LightVector3 position)
         {
-            _meshMovement.BounceFrom(position.AsUnityVector());
+            _meshMovementBase.BounceFrom(position.AsUnityVector());
         }
 
         private void OnAnimalDied()

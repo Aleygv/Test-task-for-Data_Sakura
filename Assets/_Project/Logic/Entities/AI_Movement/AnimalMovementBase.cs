@@ -5,37 +5,34 @@ using Random = UnityEngine.Random;
 
 namespace _Project.Logic.Entities.AI_Movement
 {
-    public class AnimalNavMeshMovement : MonoBehaviour
+    public abstract class AnimalMovementBase : MonoBehaviour
     {
-        [SerializeField] private NavMeshAgent agent;
+        [SerializeField] protected NavMeshAgent agent;
+        
+        protected bool IsWaiting;
+        protected Camera MainCamera;
 
         [Header("Movement Settings")] 
-        [SerializeField] private float minDistance = 3f;
-        [SerializeField] private float maxDistance = 7f;
+        [SerializeField] protected float minDistance = 3f;
+        [SerializeField] protected float maxDistance = 7f;
         [SerializeField] private float minWaitTime = 0.5f;
         [SerializeField] private float maxWaitTime = 2.0f;
 
-        [Header("Bounce Settings")] 
-        [SerializeField] private float bounceDistance = 3f;
-
         private float _waitTimer;
-        private bool _isWaiting;
-
-        private Camera _mainCamera;
 
         private void Start()
         {
-            _mainCamera = Camera.main;
+            MainCamera = Camera.main;
         }
 
         private void Update()
         {
-            if (_isWaiting)
+            if (IsWaiting)
             {
                 _waitTimer -= Time.deltaTime;
                 if (_waitTimer <= 0)
                 {
-                    _isWaiting = false;
+                    IsWaiting = false;
                     SetNewDestination();
                 }
                 return;
@@ -43,53 +40,18 @@ namespace _Project.Logic.Entities.AI_Movement
             
             if (!agent.pathPending && agent.remainingDistance <= agent.stoppingDistance)
             {
-                _isWaiting = true;
+                IsWaiting = true;
                 _waitTimer = Random.Range(minWaitTime, maxWaitTime);
             }
         }
 
         public void BounceFrom(Vector3 fromPosition)
         {
-            // Vector3 direction = transform.position - fromPosition;
-            // direction.y = 0;
-            //
-            // if (direction.sqrMagnitude < 0.001f)
-            // {
-            //     Vector2 randomDir = Random.insideUnitCircle.normalized;
-            //     direction = new Vector3(randomDir.x, 0, randomDir.y);
-            // }
-            // else
-            // {
-            //     direction.Normalize();
-            // }
-            //
-            // Vector3 targetBouncePos = transform.position + direction * bounceDistance;
-            //
-            // if (NavMesh.SamplePosition(targetBouncePos, out NavMeshHit hit, bounceDistance, NavMesh.AllAreas ))
-            // {
-            //     agent.ResetPath();
-            //     _isWaiting = false;
-            //
-            //     agent.SetDestination(hit.position);
-            // }
-
             _ = BounceRoutine(fromPosition);
         }
 
-        private void SetNewDestination()
-        {
-            // Vector3 target = GetRandomPositionAround(transform.position, minDistance, maxDistance);
-            Vector3 target = GetRandomPositionInCameraView(_mainCamera);
-
-            if (NavMesh.SamplePosition(target, out NavMeshHit hit, maxDistance, NavMesh.AllAreas))
-            {
-                agent.SetDestination(hit.position);
-            }
-            else
-            {
-                _isWaiting = false;
-            }
-        }
+        protected abstract void SetNewDestination();
+        
 
         private Vector3 GetRandomPositionAround(Vector3 origin, float minRadius, float maxRadius)
         {
@@ -97,7 +59,7 @@ namespace _Project.Logic.Entities.AI_Movement
             return new Vector3(origin.x + circle.x, origin.y, origin.z + circle.y);
         }
 
-        private Vector3 GetRandomPositionInCameraView(Camera viewCamera, float groundY = 0f, float padding = 0.1f)
+        protected Vector3 GetRandomPositionInCameraView(Camera viewCamera, float groundY = 0f, float padding = 0.1f)
         {
             float randomX = Random.Range(padding, 1f - padding);
             float randomY = Random.Range(padding, 1f - padding);
@@ -148,7 +110,7 @@ namespace _Project.Logic.Entities.AI_Movement
             }
 
             agent.isStopped = false;
-            _isWaiting = true;
+            IsWaiting = true;
             _waitTimer = 0.4f;
         }
     }

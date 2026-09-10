@@ -15,7 +15,7 @@ GameObject:
   - component: {fileID: 4499900171109693172}
   - component: {fileID: 1617706283062171639}
   - component: {fileID: 7954873776120208121}
-  - component: {fileID: 2493527667122485623}
+  - component: {fileID: 1505292699100631652}
   m_Layer: 0
   m_Name: Snake
   m_TagString: Untagged
@@ -177,7 +177,7 @@ NavMeshAgent:
   m_BaseOffset: 0.5
   m_WalkableMask: 4294967295
   m_ObstacleAvoidanceType: 4
---- !u!114 &2493527667122485623
+--- !u!114 &1505292699100631652
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -186,11 +186,11 @@ MonoBehaviour:
   m_GameObject: {fileID: 6141141169548140546}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 88e3d04713f8d0a418ddae38f7d0c919, type: 3}
+  m_Script: {fileID: 11500000, guid: 84cefa9b1b354f9ba56a325a14673824, type: 3}
   m_Name: 
-  m_EditorClassIdentifier: '::'
+  m_EditorClassIdentifier: Assembly-CSharp::_Project.Logic.Entities.AI_Movement.LinearMovement
   agent: {fileID: 7954873776120208121}
   minDistance: 3
   maxDistance: 7
   minWaitTime: 0.5
-  maxWaitTime: 1
+  maxWaitTime: 2
