@@ -33,16 +33,19 @@ namespace _Project.Logic.Services
             if (Random.value > 0.5f)
             {
                 a.Die();
+                b.Eat();
             }
             else
             {
                 b.Die();
+                a.Eat();
             }
         }
 
         public void HandlePredatorWithPray(IAnimal predator, IAnimal prey)
         {
             prey.Die();
+            predator.Eat();
         }
 
         public void Resolve(IAnimal first, IAnimal second)

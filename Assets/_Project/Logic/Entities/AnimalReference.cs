@@ -1,6 +1,7 @@
 ﻿using System;
 using _Project.Logic.Entities.AI_Movement;
 using _Project.Logic.Extensions;
+using _Project.Logic.UI_Logic;
 using UnityEngine;
 
 namespace _Project.Logic.Entities
@@ -12,14 +13,22 @@ namespace _Project.Logic.Entities
         public IAnimal Animal { get; private set; }
 
         private AnimalMovementBase _meshMovementBase;
+        private TastyLabelView _labelView;
 
         public void Initialize(IAnimal animal)
         {
             Animal = animal;
             Animal.OnDie += OnAnimalDied;
             Animal.OnBounce += HandleBounce;
+            Animal.OnAte += HandleAte;
             
             _meshMovementBase = GetComponent<AnimalMovementBase>();
+            _labelView = GetComponent<TastyLabelView>();
+        }
+
+        private void HandleAte()
+        {
+            _labelView?.ShowTasty();
         }
 
         private void HandleBounce(LightVector3 position)
@@ -33,6 +42,7 @@ namespace _Project.Logic.Entities
             {
                 Animal.OnDie -= OnAnimalDied;
                 Animal.OnBounce -= HandleBounce;
+                Animal.OnAte -= HandleAte;
                 
                 Animal = null;
             }
