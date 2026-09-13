@@ -1,4 +1,5 @@
-using _Project.Logic.UI_Logic;
+using _Project.Logic.Entities;
+using UnityEngine;
 using Zenject;
 
 namespace _Project.Logic.Infrastructure
@@ -7,8 +8,7 @@ namespace _Project.Logic.Infrastructure
     {
         public override void InstallBindings()
         {
-            // Container.Bind<AnimalViewCounter>().FromComponentInHierarchy().AsSingle();
-            // Container.BindInterfacesAndSelfTo<AnimalScorePresenter>().AsSingle().NonLazy();
+            Container.Bind<SpawnPositionProvider>().FromComponentInHierarchy().AsSingle();
         } 
     }
 }

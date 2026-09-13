@@ -1,5 +1,6 @@
-﻿using System;
+using System;
 using System.Threading;
+using _Project.Logic.Entities;
 using _Project.Logic.Services;
 using Cysharp.Threading.Tasks;
 using UnityEngine;
@@ -10,15 +11,17 @@ namespace _Project.Logic.Infrastructure
 {
     public class GameCycleScript : MonoBehaviour
     {
-        [SerializeField] private float spawnInterval = 2f;
-        private IAnimalFabric _animalFabric;
+        [SerializeField] private float minSpawnInterval = 1f;
+        [SerializeField] private float maxSpawnInterval = 2f;
         
-        private float _timeCounter;
+        private IAnimalFabric _animalFabric;
+        private SpawnPositionProvider _spawnPositionProvider;
 
         [Inject]
-        public void Construct(IAnimalFabric animalFabric)
+        public void Construct(IAnimalFabric animalFabric, SpawnPositionProvider spawnPositionProvider)
         {
             _animalFabric = animalFabric;
+            _spawnPositionProvider = spawnPositionProvider;
         }
 
         private void Start()
@@ -30,11 +33,11 @@ namespace _Project.Logic.Infrastructure
         {
             while (!ct.IsCancellationRequested)
             {
-                float delay = Random.Range(1f, spawnInterval);
+                float delay = Random.Range(minSpawnInterval, maxSpawnInterval);
 
                 await UniTask.Delay(TimeSpan.FromSeconds(delay), DelayType.DeltaTime, PlayerLoopTiming.Update, ct);
 
-                await _animalFabric.SpawnRandomAnimal();
+                await _animalFabric.SpawnRandomAnimal(_spawnPositionProvider.GetSpawnPosition());
             }
         }
 

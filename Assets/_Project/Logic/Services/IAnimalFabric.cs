@@ -6,8 +6,8 @@ namespace _Project.Logic.Services
 {
     public interface IAnimalFabric
     {
-        UniTask<GameObject> SpawnByConfig(AnimalConfig config);
-        UniTask<GameObject> SpawnRandomAnimal();
-        UniTask<GameObject> SpawnRandomByRole(AnimalRole role);
+        UniTask<GameObject> SpawnByConfig(AnimalConfig config, Vector3 atPosition);
+        UniTask<GameObject> SpawnRandomAnimal(Vector3 atPosition);
+        UniTask<GameObject> SpawnRandomByRole(AnimalRole role, Vector3 atPosition);
     }
 }

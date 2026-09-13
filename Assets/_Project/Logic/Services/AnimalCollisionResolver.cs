@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using _Project.Logic.Entities;
-using _Project.Logic.Entities.Animals.Preyes;
 using Random = UnityEngine.Random;
 
 namespace _Project.Logic.Services
@@ -16,16 +15,14 @@ namespace _Project.Logic.Services
             {
                 { (AnimalRole.Prey, AnimalRole.Prey), HandlePreyWithPray },
                 { (AnimalRole.Predator, AnimalRole.Predator), HandlePredatorWithPredator },
-                { (AnimalRole.Predator, AnimalRole.Prey), HandlePredatorWithPray },
-                { (AnimalRole.Prey, AnimalRole.Predator), (pray, pred)
-                    => HandlePredatorWithPray(pred, pray) }
+                { (AnimalRole.Predator, AnimalRole.Prey), HandlePredatorWithPrey },
             };
         }
 
         public void HandlePreyWithPray(IAnimal a, IAnimal b)
         {
-            a.Bounce(b.Position);
-            b.Bounce(a.Position);
+            a.Bounce();
+            b.Bounce();
         }
 
         public void HandlePredatorWithPredator(IAnimal a, IAnimal b)
@@ -42,8 +39,11 @@ namespace _Project.Logic.Services
             }
         }
 
-        public void HandlePredatorWithPray(IAnimal predator, IAnimal prey)
+        public void HandlePredatorWithPrey(IAnimal a, IAnimal b)
         {
+            IAnimal predator = a.Role == AnimalRole.Predator ? a : b;
+            IAnimal prey = a.Role == AnimalRole.Prey ? a : b;
+            
             prey.Die();
             predator.Eat();
         }
@@ -53,7 +53,8 @@ namespace _Project.Logic.Services
             if (first == null || second == null)
                 return;
 
-            if (_interactionMatrix.TryGetValue((first.Role, second.Role), out var action))
+            if (_interactionMatrix.TryGetValue((first.Role, second.Role), out Action<IAnimal, IAnimal> action) ||
+                _interactionMatrix.TryGetValue((second.Role, first.Role), out action))
             {
                 action(first, second);
             }

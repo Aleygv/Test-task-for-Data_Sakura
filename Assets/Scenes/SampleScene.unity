@@ -129,6 +129,7 @@ GameObject:
   m_Component:
   - component: {fileID: 6639589}
   - component: {fileID: 6639588}
+  - component: {fileID: 6639590}
   m_Layer: 0
   m_Name: GameCycle
   m_TagString: Untagged
@@ -148,7 +149,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 4746283f7cac495f83a33d51525cf98d, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::_Project.Logic.Entities.GameCycleScript
-  spawnInterval: 3
+  minSpawnInterval: 1
+  maxSpawnInterval: 2
 --- !u!4 &6639589
 Transform:
   m_ObjectHideFlags: 0
@@ -158,12 +160,26 @@ Transform:
   m_GameObject: {fileID: 6639587}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: -0.26378, y: 0, z: -3.2144}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &6639590
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6639587}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 45ed6e1ad5f54dc5824793c42c3c9186, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::_Project.Logic.Entities.SpawnPositionProvider
+  mainCamera: {fileID: 330585545}
+  navMeshSampleDistance: 2
 --- !u!1 &330585543
 GameObject:
   m_ObjectHideFlags: 0
@@ -663,7 +679,7 @@ Transform:
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 1.11, y: -0.2, z: 2.02}
-  m_LocalScale: {x: 2.2021, y: 2.2021, z: 4.1014113}
+  m_LocalScale: {x: 5.201801, y: 5.201801, z: 9.688354}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 0}

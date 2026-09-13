@@ -1,6 +1,5 @@
-﻿using System;
+using System;
 using _Project.Logic.Entities.AI_Movement;
-using _Project.Logic.Extensions;
 using _Project.Logic.UI_Logic;
 using UnityEngine;
 
@@ -12,7 +11,7 @@ namespace _Project.Logic.Entities
 
         public IAnimal Animal { get; private set; }
 
-        private AnimalMovementBase _meshMovementBase;
+        private IMovement _meshMovementBase;
         private TastyLabelView _labelView;
 
         public void Initialize(IAnimal animal)
@@ -22,7 +21,7 @@ namespace _Project.Logic.Entities
             Animal.OnBounce += HandleBounce;
             Animal.OnAte += HandleAte;
             
-            _meshMovementBase = GetComponent<AnimalMovementBase>();
+            _meshMovementBase = GetComponent<IMovement>();
             _labelView = GetComponent<TastyLabelView>();
         }
 
@@ -31,9 +30,9 @@ namespace _Project.Logic.Entities
             _labelView?.ShowTasty();
         }
 
-        private void HandleBounce(LightVector3 position)
+        private void HandleBounce()
         {
-            _meshMovementBase.BounceFrom(position.AsUnityVector());
+            _meshMovementBase.Bounce();
         }
 
         private void OnAnimalDied()
@@ -50,9 +49,14 @@ namespace _Project.Logic.Entities
             Destroy(gameObject);
         }
 
+        private void Update()
+        {
+            Animal?.Tick(Time.deltaTime);
+        }
+
         private void OnTriggerEnter(Collider other)
         {
-            if (other.TryGetComponent<AnimalReference>(out var animalReference))
+            if (other.TryGetComponent<AnimalReference>(out AnimalReference animalReference))
             {
                 OnAnimalCollided?.Invoke(Animal, animalReference.Animal);
             }
