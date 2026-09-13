@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
 using _Project.Logic.Entities;
 
 namespace _Project.Logic.Services
@@ -27,7 +26,7 @@ namespace _Project.Logic.Services
             _deathCounters.TryAdd(role, 0);
 
             _deathCounters[role]++;
-            
+
             OnAnimalDied?.Invoke(role, _deathCounters[role]);
         }
     }

@@ -1,11 +1,10 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using _Project.Logic.Entities;
-using _Project.Logic.Entities.Animals;
 using _Project.Logic.Entities.Animals.Predators;
 using _Project.Logic.Entities.Animals.Preyes;
-using _Project.Logic.Extensions;
+using _Project.Logic.Infrastructure;
 using Cysharp.Threading.Tasks;
 using UnityEngine;
 using Zenject;
@@ -15,14 +14,9 @@ namespace _Project.Logic.Services
 {
     public class AnimalFabric : IAnimalFabric
     {
-        private const string FrogPath = "Prefabs/Animals/Frog.prefab";
-        private const string SnakePath = "Prefabs/Animals/Snake.prefab";
-
         private IAssets _assets;
         private IAnimalCollisionResolver _collisionResolver;
         private IAnimalRegistry _registry;
-
-        private readonly List<AnimalConfig> _animalConfigs;
 
         [Inject]
         public AnimalFabric(IAssets assets, IAnimalCollisionResolver collisionResolver, IAnimalRegistry registry)
@@ -30,39 +24,54 @@ namespace _Project.Logic.Services
             _assets = assets;
             _collisionResolver = collisionResolver;
             _registry = registry;
-
-            _animalConfigs = new List<AnimalConfig>
-            {
-                new(FrogPath, AnimalRole.Prey, (id, pos) => new Frog(id, pos)),
-                new(SnakePath, AnimalRole.Predator, (id, pos) => new Snake(id, pos))
-            };
         }
 
-        public async UniTask<GameObject> SpawnByConfig(AnimalConfig config)
+        public async UniTask<GameObject> SpawnByConfig(AnimalConfig config, Vector3 atPosition)
         {
-            GameObject prefab = await _assets.Instantiate(config.PrefabPath);
-            IAnimal animal = config.Factory.Invoke(Guid.NewGuid(), SpawnPositions.GetRandomPosition());
+            GameObject animalObject = await _assets.Instantiate(config.PrefabPath);
+            animalObject.transform.position = atPosition;
+
+            IMovement movement = animalObject.GetComponent<IMovement>();
+            
+            IAnimal animal;
+            Guid id = Guid.NewGuid();
+
+            switch (config.AnimalType)
+            {
+                case AnimalType.Frog:
+                    animal = new Frog(id, config.Role, movement);
+                    break;
+                
+                case AnimalType.Snake:
+                    animal = new Snake(id, config.Role, movement);
+                    break;
+                
+                default:
+                    throw new ArgumentException($"Unknown type of animal");
+            }
 
             _registry.Register(animal);
 
-            AnimalReference animalReference = prefab.GetComponent<AnimalReference>();
+            AnimalReference animalReference = animalObject.GetComponent<AnimalReference>();
             animalReference.Initialize(animal);
             animalReference.OnAnimalCollided += _collisionResolver.Resolve;
-            prefab.transform.position = animal.Position.AsUnityVector();
-            return prefab;            
+            
+            return animalObject;            
         }
 
-        public UniTask<GameObject> SpawnRandomAnimal()
+        public UniTask<GameObject> SpawnRandomAnimal(Vector3 atPosition)
         {
-            int range = Random.Range(0, _animalConfigs.Count);
-            return SpawnByConfig(_animalConfigs[range]);
+            List<AnimalConfig> animalConfigs = GameConfigs.AnimalConfigs;
+            int range = Random.Range(0, animalConfigs.Count);
+            return SpawnByConfig(animalConfigs[range], atPosition);
         }
 
-        public UniTask<GameObject> SpawnRandomByRole(AnimalRole role)
+        public UniTask<GameObject> SpawnRandomByRole(AnimalRole role, Vector3 atPosition)
         {
-            List<AnimalConfig> roleConfigs = _animalConfigs.Where(c => c.Role == role).ToList();
+            List<AnimalConfig> animalConfigs = GameConfigs.AnimalConfigs;
+            List<AnimalConfig> roleConfigs = animalConfigs.Where(c => c.Role == role).ToList();
             var randomConfig = roleConfigs[Random.Range(0, roleConfigs.Count)];
-            return SpawnByConfig(randomConfig);
+            return SpawnByConfig(randomConfig, atPosition);
         }
     }
 }

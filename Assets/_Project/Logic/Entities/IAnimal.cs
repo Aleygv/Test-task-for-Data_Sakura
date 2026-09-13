@@ -1,5 +1,4 @@
 ﻿using System;
-using _Project.Logic.Extensions;
 
 namespace _Project.Logic.Entities
 {
@@ -7,13 +6,13 @@ namespace _Project.Logic.Entities
     {
         Guid Id { get; }
         AnimalRole Role { get; }
-        LightVector3 Position { get; set; }
         event Action OnDie;
-        event Action<LightVector3> OnBounce;
+        event Action OnBounce;
         public event Action OnAte; // Событие: животное только что поело
         void Die();
-        void Bounce(LightVector3 position);
+        void Bounce();
         public void Eat();
+        void Tick(float deltaTime);
     }
 
     public enum AnimalRole

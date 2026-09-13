@@ -1,19 +1,16 @@
-﻿using System;
-using _Project.Logic.Extensions;
-
-namespace _Project.Logic.Entities
+﻿namespace _Project.Logic.Entities
 {
     public class AnimalConfig
     {
-        public string PrefabPath { get; }
+        public AnimalType AnimalType { get; }
         public AnimalRole Role { get; }
-        public Func<Guid, LightVector3, IAnimal> Factory { get; }
+        public string PrefabPath { get; }
 
-        public AnimalConfig(string prefabPath, AnimalRole role, Func<Guid, LightVector3, IAnimal> factory)
+        public AnimalConfig(AnimalType animalType, AnimalRole role, string prefabPath)
         {
+            AnimalType = animalType;
             PrefabPath = prefabPath;
             Role = role;
-            Factory = factory;
         }
     }
 }
