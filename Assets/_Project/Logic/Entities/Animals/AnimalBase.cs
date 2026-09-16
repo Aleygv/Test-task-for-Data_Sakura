@@ -22,7 +22,12 @@ namespace _Project.Logic.Entities.Animals
         public abstract void Tick(float deltaTime);
 
         public virtual void Die() => OnDie?.Invoke();
-        public virtual void Bounce() => OnBounce?.Invoke();
+        public virtual void Bounce()
+        {
+            Movement.Bounce();
+            OnBounce?.Invoke();
+        }
+
         public virtual void Eat() => OnAte?.Invoke();
     }
 }

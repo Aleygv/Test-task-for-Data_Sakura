@@ -9,7 +9,6 @@ namespace _Project.Logic.Entities.Animals.Preyes
         private const float DefaultStepDistance = 2.5f;
         private const float DefaultJumpInterval = 1.5f;
         private const float MinInitialTimerOffset = 0.2f;
-        private const float BounceTimerMultiplier = 0.5f;
         private const float MaxDistanceFromCenterSqr = 100.0f;
         private const float MaxTurnAngle = 25.0f;
 
@@ -38,13 +37,6 @@ namespace _Project.Logic.Entities.Animals.Preyes
                 Vector3 target = CalculateNextJumpTarget();
                 Movement.MovePosition(target);
             }
-        }
-
-        public override void Bounce()
-        {
-            base.Bounce();
-            _currentDirection = -_currentDirection;
-            _timer = _jumpInterval * BounceTimerMultiplier;
         }
 
         private Vector3 CalculateNextJumpTarget()

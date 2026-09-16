@@ -8,7 +8,6 @@ namespace _Project.Logic.Entities.Animals.Predators
     {
         private const float MaxRepathInterval = 4.0f;
         private const float ArrivalThreshold = 1.2f;
-        private const float BounceTargetOffset = 6.0f;
         private const float MaxArenaRadiusSqr = 80.0f;
         private const float CenterReturnRadius = 4.0f;
         private const float MinTargetDistance = 4.0f;
@@ -36,16 +35,6 @@ namespace _Project.Logic.Entities.Animals.Predators
                 _currentTarget = PickNewTarget(currentPos);
                 Movement.MovePosition(_currentTarget);
             }
-        }
-
-        public override void Bounce()
-        {
-            base.Bounce();
-            Vector3 currentPos = Movement.CurrentPosition;
-            Vector3 bounceDirection = (Vector3.zero - currentPos).normalized;
-            _currentTarget = currentPos + bounceDirection * BounceTargetOffset;
-            _repathTimer = MaxRepathInterval;
-            Movement.MovePosition(_currentTarget);
         }
 
         private Vector3 PickNewTarget(Vector3 currentPos)
