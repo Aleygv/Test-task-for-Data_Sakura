@@ -10,13 +10,14 @@ namespace _Project.Logic.Entities.AIMovement
         protected const float MinDirectionMagnitudeSqr = 0.01f;
         protected const float WarpSampleTolerance = 0.5f;
         protected const float ParabolaMultiplier = 4f;
-        private const float BounceArcHeight = 0.5f;
-
+        
         [SerializeField] protected NavMeshAgent agent;
         [SerializeField] protected float bounceDistance = 2.0f;
         [SerializeField] protected float bounceDuration = 0.25f;
 
         protected bool IsJumping;
+        
+        private const float BounceArcHeight = 0.5f;
 
         public Vector3 CurrentPosition => transform.position;
 
