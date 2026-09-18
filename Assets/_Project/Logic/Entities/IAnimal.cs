@@ -14,10 +14,4 @@ namespace _Project.Logic.Entities
         public void Eat();
         void Tick(float deltaTime);
     }
-
-    public enum AnimalRole
-    {
-        Prey,
-        Predator
-    }
 }
