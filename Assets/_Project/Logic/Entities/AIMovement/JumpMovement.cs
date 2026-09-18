@@ -7,9 +7,7 @@ namespace _Project.Logic.Entities.AIMovement
 {
     public class JumpMovement : MovementBase
     {
-        [Header("Jump Settings")] [SerializeField]
-        private float jumpDistance = 2.5f;
-
+        [SerializeField] private float jumpDistance = 2.5f;
         [SerializeField] private float jumpHeight = 1.0f;
         [SerializeField] private float jumpDuration = 0.35f;
 
