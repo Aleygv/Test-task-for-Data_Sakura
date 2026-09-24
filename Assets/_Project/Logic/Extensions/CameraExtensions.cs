@@ -7,7 +7,8 @@ namespace _Project.Logic.Extensions
         private const float DefaultGroundY = 0f;
         private const float DefaultPadding = 0.1f;
 
-        public static Vector3 GetRandomPositionInCameraView(this Camera viewCamera, float groundY = DefaultGroundY, float padding = DefaultPadding)
+        public static Vector3 GetRandomPositionInCameraView(this Camera viewCamera, float groundY = DefaultGroundY,
+            float padding = DefaultPadding)
         {
             float randomX = Random.Range(padding, 1f - padding);
             float randomY = Random.Range(padding, 1f - padding);
@@ -24,7 +25,7 @@ namespace _Project.Logic.Extensions
 
             return Vector3.zero;
         }
-        
+
         public static Vector3 GetRandomPositionAround(this Vector3 origin, float minRadius, float maxRadius)
         {
             Vector2 circle = Random.insideUnitCircle.normalized * Random.Range(minRadius, maxRadius);

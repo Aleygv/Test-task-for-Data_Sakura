@@ -2,30 +2,28 @@ using System;
 using UnityEngine;
 using Random = UnityEngine.Random;
 
-namespace _Project.Logic.Entities.Animals.Preyes
+namespace _Project.Logic.Entities.Animals
 {
     public class Frog : AnimalBase
     {
-        private const float DefaultStepDistance = 2.5f;
-        private const float DefaultJumpInterval = 1.5f;
-        private const float MinInitialTimerOffset = 0.2f;
-        private const float MaxDistanceFromCenterSqr = 100.0f;
-        private const float MaxTurnAngle = 25.0f;
-
         private readonly float _stepDistance;
         private readonly float _jumpInterval;
+        private readonly float _maxDistanceFromCenterSqr;
+        private readonly float _maxTurnAngle;
         private float _timer;
         private Vector3 _currentDirection;
 
-        public Frog(Guid id, AnimalRole role, IMovement movement, float stepDistance = DefaultStepDistance, float jumpInterval = DefaultJumpInterval)
-            : base(id, role, movement)
+        public Frog(Guid id, AnimalRole role, IMovement movement, float stepDistance, float jumpInterval,
+            float minInitialTimerOffset, float maxDistanceFromCenterSqr, float maxTurnAngle) : base(id, role, movement)
         {
             _stepDistance = stepDistance;
             _jumpInterval = jumpInterval;
-            _timer = Random.Range(MinInitialTimerOffset, _jumpInterval);
+            _maxDistanceFromCenterSqr = maxDistanceFromCenterSqr;
+            _maxTurnAngle = maxTurnAngle;
+            _timer = Random.Range(minInitialTimerOffset, _jumpInterval);
 
             Vector2 randomDir = Random.insideUnitCircle.normalized;
-            _currentDirection = new Vector3(randomDir.x, 0, randomDir.y);
+            _currentDirection = new Vector3(randomDir.x, 0f, randomDir.y);
         }
 
         public override void Tick(float deltaTime)
@@ -43,7 +41,7 @@ namespace _Project.Logic.Entities.Animals.Preyes
         {
             Vector3 currentPos = Movement.CurrentPosition;
 
-            if (currentPos.sqrMagnitude > MaxDistanceFromCenterSqr)
+            if (currentPos.sqrMagnitude > _maxDistanceFromCenterSqr)
             {
                 Vector3 toCenter = Vector3.zero - currentPos;
                 toCenter.y = 0;
@@ -51,7 +49,7 @@ namespace _Project.Logic.Entities.Animals.Preyes
             }
             else
             {
-                float angle = Random.Range(-MaxTurnAngle, MaxTurnAngle);
+                float angle = Random.Range(-_maxTurnAngle, _maxTurnAngle);
                 _currentDirection = Quaternion.Euler(0, angle, 0) * _currentDirection;
                 _currentDirection.y = 0;
                 _currentDirection.Normalize();

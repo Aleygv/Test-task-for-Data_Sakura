@@ -8,7 +8,7 @@ namespace _Project.Logic.Entities
         AnimalRole Role { get; }
         event Action OnDie;
         event Action OnBounce;
-        public event Action OnAte; // Событие: животное только что поело
+        public event Action OnAte;
         void Die();
         void Bounce();
         public void Eat();

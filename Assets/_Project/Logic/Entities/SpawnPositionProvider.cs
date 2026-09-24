@@ -6,14 +6,14 @@ namespace _Project.Logic.Entities
 {
     public class SpawnPositionProvider : MonoBehaviour
     {
-        [SerializeField] private Camera mainCamera;
-        [SerializeField] private float navMeshSampleDistance = 2f;
+        [SerializeField] private Camera _mainCamera;
+        [SerializeField] private float _navMeshSampleDistance = 2f;
 
         public Vector3 GetSpawnPosition()
         {
-            Vector3 targetPoint = mainCamera.GetRandomPositionInCameraView();
+            Vector3 targetPoint = _mainCamera.GetRandomPositionInCameraView();
 
-            if (NavMesh.SamplePosition(targetPoint, out NavMeshHit hit, navMeshSampleDistance, NavMesh.AllAreas))
+            if (NavMesh.SamplePosition(targetPoint, out NavMeshHit hit, _navMeshSampleDistance, NavMesh.AllAreas))
             {
                 return hit.position;
             }

@@ -1,4 +1,4 @@
-namespace _Project.Logic.UI_Logic
+namespace _Project.Logic.UILogic
 {
     public interface IAnimalScorePresenter
     {

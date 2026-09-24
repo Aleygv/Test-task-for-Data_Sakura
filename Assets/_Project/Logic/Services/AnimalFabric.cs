@@ -2,8 +2,8 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using _Project.Logic.Entities;
-using _Project.Logic.Entities.Animals.Predators;
-using _Project.Logic.Entities.Animals.Preyes;
+using _Project.Logic.Entities.Animals;
+using _Project.Logic.Entities.Configs;
 using _Project.Logic.Infrastructure;
 using Cysharp.Threading.Tasks;
 using UnityEngine;
@@ -32,20 +32,26 @@ namespace _Project.Logic.Services
             animalObject.transform.position = atPosition;
 
             IMovement movement = animalObject.GetComponent<IMovement>();
-            
+
             IAnimal animal;
             Guid id = Guid.NewGuid();
 
-            switch (config.AnimalType)
+            switch (config.AnimalTypeId)
             {
-                case AnimalType.Frog:
-                    animal = new Frog(id, config.Role, movement);
+                case AnimalTypeId.Frog:
+                    FrogConfig frogConfig = config as FrogConfig;
+                    animal = new Frog(id, config.Role, movement, frogConfig!.StepDistance,
+                        frogConfig.JumpInterval, frogConfig.MinInitialTimerOffset,
+                        frogConfig.MaxDistanceFromCenterSqr, frogConfig.MaxTurnAngle);
                     break;
-                
-                case AnimalType.Snake:
-                    animal = new Snake(id, config.Role, movement);
+
+                case AnimalTypeId.Snake:
+                    SnakeConfig snakeConfig = config as SnakeConfig;
+                    animal = new Snake(id, config.Role, movement, snakeConfig!.MaxRepathInterval,
+                        snakeConfig.ArrivalThreshold, snakeConfig.MaxArenaRadiusSqr,
+                        snakeConfig.CenterReturnRadius, snakeConfig.MinTargetDistance, snakeConfig.MaxTargetDistance);
                     break;
-                
+
                 default:
                     throw new ArgumentException($"Unknown type of animal");
             }
@@ -55,8 +61,8 @@ namespace _Project.Logic.Services
             AnimalReference animalReference = animalObject.GetComponent<AnimalReference>();
             animalReference.Initialize(animal);
             animalReference.OnAnimalCollided += _collisionResolver.Resolve;
-            
-            return animalObject;            
+
+            return animalObject;
         }
 
         public UniTask<GameObject> SpawnRandomAnimal(Vector3 atPosition)

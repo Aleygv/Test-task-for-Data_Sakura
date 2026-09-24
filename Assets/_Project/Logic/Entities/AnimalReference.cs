@@ -1,5 +1,5 @@
 using System;
-using _Project.Logic.UI_Logic;
+using _Project.Logic.UILogic;
 using UnityEngine;
 
 namespace _Project.Logic.Entities
@@ -19,7 +19,7 @@ namespace _Project.Logic.Entities
             Animal.OnDie += OnAnimalDied;
             Animal.OnBounce += HandleBounce;
             Animal.OnAte += HandleAte;
-            
+
             _meshMovementBase = GetComponent<IMovement>();
             _labelView = GetComponent<TastyLabelView>();
         }
@@ -41,7 +41,7 @@ namespace _Project.Logic.Entities
                 Animal.OnDie -= OnAnimalDied;
                 Animal.OnBounce -= HandleBounce;
                 Animal.OnAte -= HandleAte;
-                
+
                 Animal = null;
             }
 

@@ -2,21 +2,21 @@ using TMPro;
 using UnityEngine;
 using Zenject;
 
-namespace _Project.Logic.UI_Logic
+namespace _Project.Logic.UILogic
 {
     public class AnimalViewCounter : MonoBehaviour
     {
-        [SerializeField] private TextMeshProUGUI preyCounter;
-        [SerializeField] private TextMeshProUGUI predatorCounter;
+        [SerializeField] private TextMeshProUGUI _preyCounter;
+        [SerializeField] private TextMeshProUGUI _predatorCounter;
 
         public void UpdatePreyCounter(int amount)
         {
-            preyCounter.text = amount.ToString();
+            _preyCounter.text = amount.ToString();
         }
 
         public void UpdatePredatorCounter(int amount)
         {
-            predatorCounter.text = amount.ToString();
+            _predatorCounter.text = amount.ToString();
         }
 
         public class Fabric : PlaceholderFactory<AnimalViewCounter>

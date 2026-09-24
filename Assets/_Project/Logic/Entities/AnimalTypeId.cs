@@ -1,6 +1,6 @@
 ﻿namespace _Project.Logic.Entities
 {
-    public enum AnimalType
+    public enum AnimalTypeId
     {
         Frog,
         Snake

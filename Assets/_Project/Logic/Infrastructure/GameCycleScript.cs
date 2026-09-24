@@ -11,9 +11,9 @@ namespace _Project.Logic.Infrastructure
 {
     public class GameCycleScript : MonoBehaviour
     {
-        [SerializeField] private float minSpawnInterval = 1f;
-        [SerializeField] private float maxSpawnInterval = 2f;
-        
+        [SerializeField] private float _minSpawnInterval = 1f;
+        [SerializeField] private float _maxSpawnInterval = 2f;
+
         private IAnimalFabric _animalFabric;
         private SpawnPositionProvider _spawnPositionProvider;
 
@@ -33,13 +33,12 @@ namespace _Project.Logic.Infrastructure
         {
             while (!ct.IsCancellationRequested)
             {
-                float delay = Random.Range(minSpawnInterval, maxSpawnInterval);
+                float delay = Random.Range(_minSpawnInterval, _maxSpawnInterval);
 
                 await UniTask.Delay(TimeSpan.FromSeconds(delay), DelayType.DeltaTime, PlayerLoopTiming.Update, ct);
 
                 await _animalFabric.SpawnRandomAnimal(_spawnPositionProvider.GetSpawnPosition());
             }
         }
-
     }
 }

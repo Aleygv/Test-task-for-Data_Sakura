@@ -3,7 +3,7 @@ using Cysharp.Threading.Tasks;
 using UnityEngine;
 using Zenject;
 
-namespace _Project.Logic.UI_Logic
+namespace _Project.Logic.UILogic
 {
     public class UIFactory : IUIFactory
     {
