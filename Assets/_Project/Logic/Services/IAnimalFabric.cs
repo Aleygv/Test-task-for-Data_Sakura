@@ -1,4 +1,5 @@
 using _Project.Logic.Entities;
+using _Project.Logic.Entities.Configs;
 using Cysharp.Threading.Tasks;
 using UnityEngine;
 

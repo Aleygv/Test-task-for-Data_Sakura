@@ -1,5 +1,5 @@
 ﻿using System;
-using _Project.Logic.UI_Logic;
+using _Project.Logic.UILogic;
 using Cysharp.Threading.Tasks;
 using UnityEngine;
 using Zenject;
@@ -10,7 +10,7 @@ namespace _Project.Logic.Infrastructure
     {
         private readonly IAnimalScorePresenter _scorePresenter;
         private readonly IUIFactory _uiFactory;
-        
+
         [Inject]
         public Bootstrapper(IAnimalScorePresenter scorePresenter, IUIFactory uiFactory)
         {
@@ -32,7 +32,7 @@ namespace _Project.Logic.Infrastructure
             }
             catch (Exception exception)
             {
-                Debug.LogError($"Асинхронность сломалась: {exception.Message}");
+                Debug.LogError($"Async error: {exception.Message}");
             }
         }
     }

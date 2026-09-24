@@ -5,7 +5,7 @@ namespace _Project.Logic.Entities.AIMovement
 {
     public class LinearMovement : MovementBase
     {
-        [SerializeField] private float sampleDistance = 2f;
+        [SerializeField] private float _sampleDistance = 2f;
 
         public override void MovePosition(Vector3 targetPosition)
         {
@@ -14,7 +14,7 @@ namespace _Project.Logic.Entities.AIMovement
                 return;
             }
 
-            if (NavMesh.SamplePosition(targetPosition, out NavMeshHit hit, sampleDistance, NavMesh.AllAreas))
+            if (NavMesh.SamplePosition(targetPosition, out NavMeshHit hit, _sampleDistance, NavMesh.AllAreas))
             {
                 agent.SetDestination(hit.position);
             }

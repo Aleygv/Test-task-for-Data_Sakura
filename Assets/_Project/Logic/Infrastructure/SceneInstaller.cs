@@ -1,5 +1,4 @@
 using _Project.Logic.Entities;
-using UnityEngine;
 using Zenject;
 
 namespace _Project.Logic.Infrastructure
@@ -9,6 +8,6 @@ namespace _Project.Logic.Infrastructure
         public override void InstallBindings()
         {
             Container.Bind<SpawnPositionProvider>().FromComponentInHierarchy().AsSingle();
-        } 
+        }
     }
 }
