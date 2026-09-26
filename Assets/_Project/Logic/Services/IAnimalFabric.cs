@@ -1,5 +1,5 @@
 using _Project.Logic.Entities;
-using _Project.Logic.Entities.Configs;
+using _Project.Logic.Entities.Configs.Animal;
 using Cysharp.Threading.Tasks;
 using UnityEngine;
 

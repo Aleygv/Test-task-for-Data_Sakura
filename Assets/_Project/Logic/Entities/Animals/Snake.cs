@@ -1,4 +1,5 @@
 using System;
+using _Project.Logic.Entities.Configs.Movement;
 using UnityEngine;
 using Random = UnityEngine.Random;
 
@@ -6,28 +7,14 @@ namespace _Project.Logic.Entities.Animals
 {
     public class Snake : AnimalBase
     {
-        private readonly float _maxRepathInterval;
-        private readonly float _arrivalThreshold;
-        private readonly float _maxArenaRadiusSqr;
-        private readonly float _centerReturnRadius;
-        private readonly float _minTargetDistance;
-        private readonly float _maxTargetDistance;
-
+        private LinearMovementConfig _config;
         private Vector3 _currentTarget;
         private float _repathTimer;
 
-        public Snake(Guid id, AnimalRole role, IMovement movement,
-            float maxRepathInterval, float arrivalThreshold, float maxArenaRadiusSqr,
-            float centerReturnRadius, float minTargetDistance, float maxTargetDistance)
+        public Snake(Guid id, AnimalRole role, IMovement movement, LinearMovementConfig config)
             : base(id, role, movement)
         {
-            _maxRepathInterval = maxRepathInterval;
-            _arrivalThreshold = arrivalThreshold;
-            _maxArenaRadiusSqr = maxArenaRadiusSqr;
-            _centerReturnRadius = centerReturnRadius;
-            _minTargetDistance = minTargetDistance;
-            _maxTargetDistance = maxTargetDistance;
-
+            _config = config;
             _currentTarget = Vector3.zero;
             _repathTimer = 0f;
         }
@@ -35,28 +22,28 @@ namespace _Project.Logic.Entities.Animals
         public override void Tick(float deltaTime)
         {
             _repathTimer -= deltaTime;
-            Vector3 currentPos = Movement.CurrentPosition;
+            Vector3 currentPos = _movement.CurrentPosition;
 
             if (_currentTarget == Vector3.zero
-                || Vector3.Distance(currentPos, _currentTarget) < _arrivalThreshold
+                || Vector3.Distance(currentPos, _currentTarget) < _config.ArrivalThreshold
                 || _repathTimer <= 0f)
             {
-                _repathTimer = _maxRepathInterval;
+                _repathTimer = _config.MaxRepathInterval;
                 _currentTarget = PickNewTarget(currentPos);
-                Movement.MovePosition(_currentTarget);
+                _movement.MovePosition(_currentTarget);
             }
         }
 
         private Vector3 PickNewTarget(Vector3 currentPos)
         {
-            if (currentPos.sqrMagnitude > _maxArenaRadiusSqr)
+            if (currentPos.sqrMagnitude > _config.MaxArenaRadiusSqr)
             {
-                Vector2 randomInCenter = Random.insideUnitCircle * _centerReturnRadius;
+                Vector2 randomInCenter = Random.insideUnitCircle * _config.CenterReturnRadius;
                 return new Vector3(randomInCenter.x, 0f, randomInCenter.y);
             }
 
             Vector2 randomOffset = Random.insideUnitCircle.normalized *
-                                   Random.Range(_minTargetDistance, _maxTargetDistance);
+                                   Random.Range(_config.MinTargetDistance, _config.MaxTargetDistance);
             return new Vector3(currentPos.x + randomOffset.x, currentPos.y, currentPos.z + randomOffset.y);
         }
     }

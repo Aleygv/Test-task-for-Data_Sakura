@@ -13,9 +13,9 @@ namespace _Project.Logic.Entities.AIMovement
         protected const float WarpSampleTolerance = 0.5f;
         protected const float ParabolaMultiplier = 4f;
 
-        [SerializeField] protected NavMeshAgent agent;
-        [SerializeField] protected float bounceDistance = 2.0f;
-        [SerializeField] protected float bounceDuration = 0.25f;
+        [SerializeField] protected NavMeshAgent _agent;
+        [SerializeField] protected float _bounceDistance = 2.0f;
+        [SerializeField] protected float _bounceDuration = 0.25f;
 
         protected bool IsJumping;
 
@@ -36,8 +36,8 @@ namespace _Project.Logic.Entities.AIMovement
         protected virtual async UniTaskVoid BounceAsync()
         {
             IsJumping = true;
-            agent.isStopped = true;
-            agent.ResetPath();
+            _agent.isStopped = true;
+            _agent.ResetPath();
 
             Vector3 bounceDirection = -transform.forward;
             bounceDirection.y = 0;
@@ -51,9 +51,9 @@ namespace _Project.Logic.Entities.AIMovement
             }
 
             Vector3 startPos = transform.position;
-            Vector3 targetBouncePos = startPos + bounceDirection * bounceDistance;
+            Vector3 targetBouncePos = startPos + bounceDirection * _bounceDistance;
 
-            if (NavMesh.SamplePosition(targetBouncePos, out NavMeshHit hit, bounceDistance, NavMesh.AllAreas))
+            if (NavMesh.SamplePosition(targetBouncePos, out NavMeshHit hit, _bounceDistance, NavMesh.AllAreas))
             {
                 targetBouncePos = hit.position;
             }
@@ -62,22 +62,22 @@ namespace _Project.Logic.Entities.AIMovement
 
             try
             {
-                while (elapsed < bounceDuration)
+                while (elapsed < _bounceDuration)
                 {
                     elapsed += Time.deltaTime;
-                    float t = Mathf.Clamp01(elapsed / bounceDuration);
+                    float t = Mathf.Clamp01(elapsed / _bounceDuration);
                     Vector3 currentPos = Vector3.Lerp(startPos, targetBouncePos, t);
                     currentPos.y += ParabolaMultiplier * BounceArcHeight * t * (1f - t);
 
                     if (NavMesh.SamplePosition(currentPos, out NavMeshHit sampleHit, WarpSampleTolerance, NavMesh.AllAreas))
                     {
-                        agent.Warp(sampleHit.position);
+                        _agent.Warp(sampleHit.position);
                     }
 
                     await UniTask.Yield(PlayerLoopTiming.Update, destroyCancellationToken);
                 }
 
-                agent.isStopped = false;
+                _agent.isStopped = false;
                 IsJumping = false;
             }
             catch (OperationCanceledException)

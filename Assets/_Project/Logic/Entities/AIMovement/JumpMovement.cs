@@ -2,6 +2,7 @@ using System;
 using Cysharp.Threading.Tasks;
 using UnityEngine;
 using UnityEngine.AI;
+using Zenject;
 
 namespace _Project.Logic.Entities.AIMovement
 {
@@ -39,8 +40,8 @@ namespace _Project.Logic.Entities.AIMovement
         private async UniTaskVoid PerformJumpAsync(Vector3 landingPosition, Vector3 direction)
         {
             IsJumping = true;
-            agent.isStopped = true;
-            agent.ResetPath();
+            _agent.isStopped = true;
+            _agent.ResetPath();
 
             if (direction != Vector3.zero)
             {
@@ -62,13 +63,17 @@ namespace _Project.Logic.Entities.AIMovement
                     await UniTask.Yield(PlayerLoopTiming.Update, destroyCancellationToken);
                 }
 
-                agent.Warp(landingPosition);
-                agent.isStopped = false;
+                _agent.Warp(landingPosition);
+                _agent.isStopped = false;
                 IsJumping = false;
             }
             catch (OperationCanceledException)
             {
             }
+        }
+        
+        public class Fabric : PlaceholderFactory<JumpMovement>
+        {
         }
     }
 }

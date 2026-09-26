@@ -16,7 +16,7 @@ namespace _Project.Logic.Entities.AIMovement
 
             if (NavMesh.SamplePosition(targetPosition, out NavMeshHit hit, _sampleDistance, NavMesh.AllAreas))
             {
-                agent.SetDestination(hit.position);
+                _agent.SetDestination(hit.position);
             }
         }
     }
