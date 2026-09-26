@@ -1,4 +1,4 @@
-﻿namespace _Project.Logic.Entities.Configs
+﻿namespace _Project.Logic.Entities.Configs.Animal
 {
     public class AnimalConfig
     {

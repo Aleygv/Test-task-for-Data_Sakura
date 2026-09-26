@@ -1,6 +1,6 @@
-﻿namespace _Project.Logic.Entities.Configs
+﻿namespace _Project.Logic.Entities.Configs.Movement
 {
-    public class SnakeConfig : AnimalConfig
+    public class LinearMovementConfig : MovementConfig
     {
         public float MaxRepathInterval { get; }
         public float ArrivalThreshold { get; }
@@ -8,11 +8,9 @@
         public float CenterReturnRadius { get; }
         public float MinTargetDistance { get; }
         public float MaxTargetDistance { get; }
-        
-        public SnakeConfig(AnimalTypeId animalTypeId, AnimalRole role, string prefabPath,
-            float maxRepathInterval, float arrivalThreshold, float maxArenaRadiusSqr, 
-            float centerReturnRadius, float minTargetDistance, float maxTargetDistance)
-            : base(animalTypeId, role, prefabPath)
+
+        public LinearMovementConfig(float maxRepathInterval, float arrivalThreshold,
+            float maxArenaRadiusSqr, float centerReturnRadius, float minTargetDistance, float maxTargetDistance)
         {
             MaxRepathInterval = maxRepathInterval;
             ArrivalThreshold = arrivalThreshold;

@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using _Project.Logic.Entities;
 using _Project.Logic.Entities.Animals;
-using _Project.Logic.Entities.Configs;
+using _Project.Logic.Entities.Configs.Animal;
 using _Project.Logic.Infrastructure;
 using Cysharp.Threading.Tasks;
 using UnityEngine;
@@ -40,16 +40,12 @@ namespace _Project.Logic.Services
             {
                 case AnimalTypeId.Frog:
                     FrogConfig frogConfig = config as FrogConfig;
-                    animal = new Frog(id, config.Role, movement, frogConfig!.StepDistance,
-                        frogConfig.JumpInterval, frogConfig.MinInitialTimerOffset,
-                        frogConfig.MaxDistanceFromCenterSqr, frogConfig.MaxTurnAngle);
+                    animal = new Frog(id, config.Role, movement, frogConfig?.JumpMovementConfig);
                     break;
 
                 case AnimalTypeId.Snake:
                     SnakeConfig snakeConfig = config as SnakeConfig;
-                    animal = new Snake(id, config.Role, movement, snakeConfig!.MaxRepathInterval,
-                        snakeConfig.ArrivalThreshold, snakeConfig.MaxArenaRadiusSqr,
-                        snakeConfig.CenterReturnRadius, snakeConfig.MinTargetDistance, snakeConfig.MaxTargetDistance);
+                    animal = new Snake(id, config.Role, movement, snakeConfig?.LinearMovementConfig);
                     break;
 
                 default:
