@@ -21,6 +21,10 @@
 
 ---
 
+### Демонстрация геймплея
+https://github.com/user-attachments/assets/53c1de6d-25ba-491a-9a3b-c055c2a3ea36
+
+
 ## Стек технологий
 
 - Unity 6 (6000.3+)
