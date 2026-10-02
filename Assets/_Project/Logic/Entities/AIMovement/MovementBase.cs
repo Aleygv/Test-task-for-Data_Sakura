@@ -1,4 +1,5 @@
 using System;
+using _Project.Logic.Entities.Configs.Movement;
 using Cysharp.Threading.Tasks;
 using UnityEngine;
 using UnityEngine.AI;
@@ -7,25 +8,24 @@ namespace _Project.Logic.Entities.AIMovement
 {
     public abstract class MovementBase : MonoBehaviour, IMovement
     {
-        public Vector3 CurrentPosition => transform.position;
-        
         protected const float MinDirectionMagnitudeSqr = 0.01f;
         protected const float WarpSampleTolerance = 0.5f;
         protected const float ParabolaMultiplier = 4f;
 
-        [SerializeField] protected NavMeshAgent _agent;
-        [SerializeField] protected float _bounceDistance = 2.0f;
-        [SerializeField] protected float _bounceDuration = 0.25f;
-
-        protected bool IsJumping;
-
         private const float BounceArcHeight = 0.5f;
-        
-        public abstract void MovePosition(Vector3 targetPosition);
+
+        protected NavMeshAgent _agent;
+        protected float _bounceDistance = 2.0f;
+        protected float _bounceDuration = 0.25f;
+        protected bool _isJumping;
+
+        public abstract bool SetPosition(Vector3 targetPosition);
+
+        public abstract Vector3 GetNextTarget();
 
         public virtual void Bounce()
         {
-            if (IsJumping)
+            if (_isJumping)
             {
                 return;
             }
@@ -33,9 +33,14 @@ namespace _Project.Logic.Entities.AIMovement
             BounceAsync().Forget();
         }
 
+        public virtual void Initialize(MovementConfig config)
+        {
+            _agent = GetComponent<NavMeshAgent>();
+        }
+
         protected virtual async UniTaskVoid BounceAsync()
         {
-            IsJumping = true;
+            _isJumping = true;
             _agent.isStopped = true;
             _agent.ResetPath();
 
@@ -69,19 +74,26 @@ namespace _Project.Logic.Entities.AIMovement
                     Vector3 currentPos = Vector3.Lerp(startPos, targetBouncePos, t);
                     currentPos.y += ParabolaMultiplier * BounceArcHeight * t * (1f - t);
 
-                    if (NavMesh.SamplePosition(currentPos, out NavMeshHit sampleHit, WarpSampleTolerance, NavMesh.AllAreas))
+                    if (NavMesh.SamplePosition(currentPos, out NavMeshHit sampleHit, WarpSampleTolerance,
+                            NavMesh.AllAreas))
                     {
                         _agent.Warp(sampleHit.position);
                     }
 
                     await UniTask.Yield(PlayerLoopTiming.Update, destroyCancellationToken);
                 }
-
-                _agent.isStopped = false;
-                IsJumping = false;
             }
             catch (OperationCanceledException)
             {
+            }
+            finally
+            {
+                if (_agent != null)
+                {
+                    _agent.isStopped = false;
+                }
+
+                _isJumping = false;
             }
         }
     }

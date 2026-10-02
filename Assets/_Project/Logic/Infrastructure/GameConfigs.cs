@@ -12,7 +12,9 @@ namespace _Project.Logic.Infrastructure
             jumpInterval: 1.5f,
             minInitialTimerOffset: 0.2f,
             maxDistanceFromCenterSqr: 100.0f,
-            maxTurnAngle: 25.0f);
+            maxTurnAngle: 25.0f,
+            jumpHeight: 1.0f,
+            jumpDuration: 0.33f);
 
         public static readonly LinearMovementConfig LinearMovementConfig = new(
             maxRepathInterval: 4.0f,
@@ -22,17 +24,19 @@ namespace _Project.Logic.Infrastructure
             minTargetDistance: 4.0f,
             maxTargetDistance: 8.0f);
 
-        public static readonly AnimalConfig Frog = new FrogConfig(
+        public static readonly AnimalConfig Frog = new(
             AnimalTypeId.Frog,
             AnimalRole.Prey,
             "Prefabs/Animals/Frog.prefab",
-            JumpMovementConfig);
+            JumpMovementConfig,
+            0.5f);
 
-        public static readonly AnimalConfig Snake = new SnakeConfig(
+        public static readonly AnimalConfig Snake = new(
             AnimalTypeId.Snake,
             AnimalRole.Predator,
             "Prefabs/Animals/Snake.prefab",
-            LinearMovementConfig);
+            LinearMovementConfig,
+            1.2f);
 
         public static readonly List<AnimalConfig> AnimalConfigs = new()
         {

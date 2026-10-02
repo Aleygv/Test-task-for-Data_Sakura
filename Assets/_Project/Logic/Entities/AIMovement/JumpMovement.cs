@@ -1,22 +1,59 @@
 using System;
+using _Project.Logic.Entities.Configs.Movement;
 using Cysharp.Threading.Tasks;
 using UnityEngine;
 using UnityEngine.AI;
-using Zenject;
+using Random = UnityEngine.Random;
 
 namespace _Project.Logic.Entities.AIMovement
 {
     public class JumpMovement : MovementBase
     {
-        [SerializeField] private float _jumpDistance = 2.5f;
-        [SerializeField] private float _jumpHeight = 1.0f;
-        [SerializeField] private float _jumpDuration = 0.35f;
+        private JumpMovementConfig _config;
+        private Vector3 _currentDirection;
+        private float _nextJumpTime;
 
-        public override void MovePosition(Vector3 targetLandingPos)
+        public override void Initialize(MovementConfig config)
         {
-            if (IsJumping)
+            base.Initialize(config);
+
+            _config = config as JumpMovementConfig;
+            Vector2 randomDir = Random.insideUnitCircle.normalized;
+            _currentDirection = new Vector3(randomDir.x, 0f, randomDir.y);
+            _nextJumpTime = Time.time + Random.Range(_config!.MinInitialTimerOffset, _config.JumpInterval);
+        }
+
+        public override Vector3 GetNextTarget()
+        {
+            Vector3 currentPos = transform.position;
+
+            if (currentPos.sqrMagnitude > _config.MaxDistanceFromCenterSqr)
             {
-                return;
+                Vector3 toCenter = Vector3.zero - currentPos;
+                toCenter.y = 0;
+                _currentDirection = toCenter.normalized;
+            }
+            else
+            {
+                float angle = Random.Range(-_config.MaxTurnAngle, _config.MaxTurnAngle);
+                _currentDirection = Quaternion.Euler(0, angle, 0) * _currentDirection;
+                _currentDirection.y = 0;
+                _currentDirection.Normalize();
+            }
+
+            return currentPos + _currentDirection * _config.StepDistance;
+        }
+
+        public override bool SetPosition(Vector3 targetLandingPos)
+        {
+            if (_isJumping)
+            {
+                return false;
+            }
+
+            if (Time.time < _nextJumpTime)
+            {
+                return false;
             }
 
             Vector3 jumpDirection = targetLandingPos - transform.position;
@@ -31,15 +68,19 @@ namespace _Project.Logic.Entities.AIMovement
                 jumpDirection.Normalize();
             }
 
-            if (NavMesh.SamplePosition(targetLandingPos, out NavMeshHit hit, _jumpDistance, NavMesh.AllAreas))
+            if (NavMesh.SamplePosition(targetLandingPos, out NavMeshHit hit, _config.StepDistance, NavMesh.AllAreas))
             {
+                _nextJumpTime = Time.time + _config.JumpInterval;
                 PerformJumpAsync(hit.position, jumpDirection).Forget();
+                return true;
             }
+
+            return false;
         }
 
         private async UniTaskVoid PerformJumpAsync(Vector3 landingPosition, Vector3 direction)
         {
-            IsJumping = true;
+            _isJumping = true;
             _agent.isStopped = true;
             _agent.ResetPath();
 
@@ -53,27 +94,30 @@ namespace _Project.Logic.Entities.AIMovement
 
             try
             {
-                while (elapsed < _jumpDuration)
+                while (elapsed < _config.JumpDuration)
                 {
                     elapsed += Time.deltaTime;
-                    float t = Mathf.Clamp01(elapsed / _jumpDuration);
+                    float t = Mathf.Clamp01(elapsed / _config.JumpDuration);
                     Vector3 currentPos = Vector3.Lerp(startPos, landingPosition, t);
-                    currentPos.y += ParabolaMultiplier * _jumpHeight * t * (1f - t);
+                    currentPos.y += ParabolaMultiplier * _config.JumpHeight * t * (1f - t);
                     transform.position = currentPos;
                     await UniTask.Yield(PlayerLoopTiming.Update, destroyCancellationToken);
                 }
 
                 _agent.Warp(landingPosition);
-                _agent.isStopped = false;
-                IsJumping = false;
             }
             catch (OperationCanceledException)
             {
             }
-        }
-        
-        public class Fabric : PlaceholderFactory<JumpMovement>
-        {
+            finally
+            {
+                if (_agent != null)
+                {
+                    _agent.isStopped = false;
+                }
+
+                _isJumping = false;
+            }
         }
     }
 }
