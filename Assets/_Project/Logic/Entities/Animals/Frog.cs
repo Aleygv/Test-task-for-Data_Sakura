@@ -1,56 +1,31 @@
 using System;
-using _Project.Logic.Entities.Configs.Movement;
 using UnityEngine;
-using Random = UnityEngine.Random;
 
 namespace _Project.Logic.Entities.Animals
 {
     public class Frog : AnimalBase
     {
-        private readonly JumpMovementConfig _config;
-        private float _timer;
-        private Vector3 _currentDirection;
+        private Vector3 _currentTarget;
+        private bool _hasTarget;
 
-        public Frog(Guid id, AnimalRole role, IMovement movement, JumpMovementConfig config) : base(id, role, movement)
+        public Frog(Guid id, AnimalRole role, IMovement movement, float nextPositionRadius)
+            : base(id, role, movement, nextPositionRadius)
         {
-            _config = config;
-            
-            _timer = Random.Range(_config.MinInitialTimerOffset, _config.JumpInterval);
-
-            Vector2 randomDir = Random.insideUnitCircle.normalized;
-            _currentDirection = new Vector3(randomDir.x, 0f, randomDir.y);
+            _currentTarget = _movement.transform.position;
+            _hasTarget = false;
         }
 
         public override void Tick(float deltaTime)
         {
-            _timer -= deltaTime;
-            if (_timer <= 0f)
+            if (!_hasTarget || IsTargetReached(_currentTarget))
             {
-                _timer = _config.JumpInterval;
-                Vector3 target = CalculateNextJumpTarget();
-                _movement.MovePosition(target);
+                Vector3 nextTarget = _movement.GetNextTarget();
+                if (_movement.SetPosition(nextTarget))
+                {
+                    _currentTarget = nextTarget;
+                    _hasTarget = true;
+                }
             }
-        }
-
-        private Vector3 CalculateNextJumpTarget()
-        {
-            Vector3 currentPos = _movement.CurrentPosition;
-
-            if (currentPos.sqrMagnitude > _config.MaxDistanceFromCenterSqr)
-            {
-                Vector3 toCenter = Vector3.zero - currentPos;
-                toCenter.y = 0;
-                _currentDirection = toCenter.normalized;
-            }
-            else
-            {
-                float angle = Random.Range(-_config.MaxTurnAngle, _config.MaxTurnAngle);
-                _currentDirection = Quaternion.Euler(0, angle, 0) * _currentDirection;
-                _currentDirection.y = 0;
-                _currentDirection.Normalize();
-            }
-
-            return currentPos + _currentDirection * _config.StepDistance;
         }
     }
 }

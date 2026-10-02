@@ -2,8 +2,10 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using _Project.Logic.Entities;
+using _Project.Logic.Entities.AIMovement;
 using _Project.Logic.Entities.Animals;
 using _Project.Logic.Entities.Configs.Animal;
+using _Project.Logic.Entities.Configs.Movement;
 using _Project.Logic.Infrastructure;
 using Cysharp.Threading.Tasks;
 using UnityEngine;
@@ -31,7 +33,7 @@ namespace _Project.Logic.Services
             GameObject animalObject = await _assets.Instantiate(config.PrefabPath);
             animalObject.transform.position = atPosition;
 
-            IMovement movement = animalObject.GetComponent<IMovement>();
+            IMovement movement = CreateMovement(animalObject, config.MovementConfig);
 
             IAnimal animal;
             Guid id = Guid.NewGuid();
@@ -39,19 +41,17 @@ namespace _Project.Logic.Services
             switch (config.AnimalTypeId)
             {
                 case AnimalTypeId.Frog:
-                    FrogConfig frogConfig = config as FrogConfig;
-                    animal = new Frog(id, config.Role, movement, frogConfig?.JumpMovementConfig);
+                    animal = new Frog(id, config.Role, movement, config.NextPositionRadius);
                     break;
 
                 case AnimalTypeId.Snake:
-                    SnakeConfig snakeConfig = config as SnakeConfig;
-                    animal = new Snake(id, config.Role, movement, snakeConfig?.LinearMovementConfig);
+                    animal = new Snake(id, config.Role, movement, config.NextPositionRadius);
                     break;
 
                 default:
                     throw new ArgumentException($"Unknown type of animal");
             }
-
+            
             _registry.Register(animal);
 
             AnimalReference animalReference = animalObject.GetComponent<AnimalReference>();
@@ -59,6 +59,24 @@ namespace _Project.Logic.Services
             animalReference.OnAnimalCollided += _collisionResolver.Resolve;
 
             return animalObject;
+        }
+
+        private IMovement CreateMovement(GameObject animalObject, MovementConfig movementConfig)
+        {
+            // foreach (MovementBase existing in animalObject.GetComponents<MovementBase>())
+            // {
+            //     UnityEngine.Object.DestroyImmediate(existing);
+            // }
+
+            MovementBase movement = movementConfig switch
+            {
+                JumpMovementConfig => animalObject.AddComponent<JumpMovement>(),
+                LinearMovementConfig => animalObject.AddComponent<LinearMovement>(),
+                _ => throw new ArgumentException($"Unknown movement config type: {movementConfig?.GetType().Name}")
+            };
+
+            movement.Initialize(movementConfig);
+            return movement;
         }
 
         public UniTask<GameObject> SpawnRandomAnimal(Vector3 atPosition)
