@@ -1,10 +1,9 @@
-using _Project.Logic.Infrastructure;
 using _Project.Logic.Services;
 using _Project.Logic.UILogic;
 using UnityEngine;
 using Zenject;
 
-namespace _Project.Resources
+namespace _Project.Logic.Infrastructure
 {
     public class BootstrapInstaller : MonoInstaller
     {
