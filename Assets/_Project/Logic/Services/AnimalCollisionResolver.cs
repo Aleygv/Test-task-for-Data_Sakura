@@ -43,7 +43,7 @@ namespace _Project.Logic.Services
         {
             IAnimal predator = a.Role == AnimalRole.Predator ? a : b;
             IAnimal prey = a.Role == AnimalRole.Prey ? a : b;
-            
+
             prey.Die();
             predator.Eat();
         }

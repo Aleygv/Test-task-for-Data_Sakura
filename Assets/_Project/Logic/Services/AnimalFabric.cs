@@ -51,7 +51,7 @@ namespace _Project.Logic.Services
                 default:
                     throw new ArgumentException($"Unknown type of animal");
             }
-            
+
             _registry.Register(animal);
 
             AnimalReference animalReference = animalObject.GetComponent<AnimalReference>();
@@ -63,11 +63,6 @@ namespace _Project.Logic.Services
 
         private IMovement CreateMovement(GameObject animalObject, MovementConfig movementConfig)
         {
-            // foreach (MovementBase existing in animalObject.GetComponents<MovementBase>())
-            // {
-            //     UnityEngine.Object.DestroyImmediate(existing);
-            // }
-
             MovementBase movement = movementConfig switch
             {
                 JumpMovementConfig => animalObject.AddComponent<JumpMovement>(),
