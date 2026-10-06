@@ -61,19 +61,6 @@ namespace _Project.Logic.Services
             return animalObject;
         }
 
-        private IMovement CreateMovement(GameObject animalObject, MovementConfig movementConfig)
-        {
-            MovementBase movement = movementConfig switch
-            {
-                JumpMovementConfig => animalObject.AddComponent<JumpMovement>(),
-                LinearMovementConfig => animalObject.AddComponent<LinearMovement>(),
-                _ => throw new ArgumentException($"Unknown movement config type: {movementConfig?.GetType().Name}")
-            };
-
-            movement.Initialize(movementConfig);
-            return movement;
-        }
-
         public UniTask<GameObject> SpawnRandomAnimal(Vector3 atPosition)
         {
             List<AnimalConfig> animalConfigs = GameConfigs.AnimalConfigs;
@@ -87,6 +74,19 @@ namespace _Project.Logic.Services
             List<AnimalConfig> roleConfigs = animalConfigs.Where(c => c.Role == role).ToList();
             var randomConfig = roleConfigs[Random.Range(0, roleConfigs.Count)];
             return SpawnByConfig(randomConfig, atPosition);
+        }
+
+        private IMovement CreateMovement(GameObject animalObject, MovementConfig movementConfig)
+        {
+            MovementBase movement = movementConfig switch
+            {
+                JumpMovementConfig => animalObject.AddComponent<JumpMovement>(),
+                LinearMovementConfig => animalObject.AddComponent<LinearMovement>(),
+                _ => throw new ArgumentException($"Unknown movement config type: {movementConfig?.GetType().Name}")
+            };
+
+            movement.Initialize(movementConfig);
+            return movement;
         }
     }
 }

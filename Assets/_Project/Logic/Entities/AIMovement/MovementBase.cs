@@ -11,12 +11,12 @@ namespace _Project.Logic.Entities.AIMovement
         protected const float MinDirectionMagnitudeSqr = 0.01f;
         protected const float WarpSampleTolerance = 0.5f;
         protected const float ParabolaMultiplier = 4f;
+        protected const float BounceDistance = 2.0f;
+        protected const float BounceDuration = 0.25f;
 
         private const float BounceArcHeight = 0.5f;
 
         protected NavMeshAgent _agent;
-        protected float _bounceDistance = 2.0f;
-        protected float _bounceDuration = 0.25f;
         protected bool _isJumping;
 
         public abstract bool SetPosition(Vector3 targetPosition);
@@ -56,9 +56,9 @@ namespace _Project.Logic.Entities.AIMovement
             }
 
             Vector3 startPos = transform.position;
-            Vector3 targetBouncePos = startPos + bounceDirection * _bounceDistance;
+            Vector3 targetBouncePos = startPos + bounceDirection * BounceDistance;
 
-            if (NavMesh.SamplePosition(targetBouncePos, out NavMeshHit hit, _bounceDistance, NavMesh.AllAreas))
+            if (NavMesh.SamplePosition(targetBouncePos, out NavMeshHit hit, BounceDistance, NavMesh.AllAreas))
             {
                 targetBouncePos = hit.position;
             }
@@ -67,10 +67,10 @@ namespace _Project.Logic.Entities.AIMovement
 
             try
             {
-                while (elapsed < _bounceDuration)
+                while (elapsed < BounceDuration)
                 {
                     elapsed += Time.deltaTime;
-                    float t = Mathf.Clamp01(elapsed / _bounceDuration);
+                    float t = Mathf.Clamp01(elapsed / BounceDuration);
                     Vector3 currentPos = Vector3.Lerp(startPos, targetBouncePos, t);
                     currentPos.y += ParabolaMultiplier * BounceArcHeight * t * (1f - t);
 
