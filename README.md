@@ -42,194 +42,27 @@ https://github.com/user-attachments/assets/53c1de6d-25ba-491a-9a3b-c055c2a3ea36
 
 Основное требование ТЗ — возможность легко добавлять новые типы животных. Это достигается следующим образом:
 
-1. **Модель отделена от представления.** Классы животных (`AnimalBase`, `Frog`, `Snake`) — чистый C#, реализуют интерфейс `IAnimal`. Они не зависят от `MonoBehaviour` и содержат только логику поведения. Компонент `AnimalReference` связывает Unity GameObject с C#-моделью.
+1. **Модель**: `Snake`, `Frog` - наследники `AnimalBase`, который реализует `IAnimal`. Не зависят от `MonoBehaviour`. Содкржат только логику перемещения.
 
-2. **Движение вынесено за интерфейс `IMovement`.** Конкретные реализации (`JumpMovement`, `LinearMovement`) — это MonoBehaviour-компоненты, которые создаются фабрикой через `AddComponent` и настраиваются через `Initialize(MovementConfig)`. Любое животное может получить любой тип движения без изменения кода — достаточно поменять конфиг.
+2. **Представление**: `AnimalReference` связывает `IAnimal` с Unity.
 
-3. **Конфигурация через данные.** Параметры каждого животного (тип, роль, путь к префабу, числовые настройки поведения, радиус достижения цели) вынесены в конфиг-классы (`AnimalConfig`, `JumpMovementConfig`, `LinearMovementConfig`). Все конфиги централизованы в `GameConfigs`. Фабрика `AnimalFabric` создаёт животных по конфигу.
+3. **Перемещение животных**: `JumpMovement`, `LinearMovement` — это наследники `IMovement`. Они являются MonoBehaviour-компонентами. Любое животное может получить любой тип движения через изменение конфига.
 
-4. **Матрица взаимодействий.** Правила столкновений между ролями (`Prey` vs `Prey`, `Predator` vs `Prey`, `Predator` vs `Predator`) вынесены в `AnimalCollisionResolver` в виде словаря делегатов, без цепочек `if-else`. При добавлении новой роли достаточно дописать пару записей в матрицу.
+4. **Конфиги**: `тип`, `роль`, `путь к префабу`, `числовые настройки поведения`, `радиус достижения цели вынесены в конфиг-классы`. Фабрика `AnimalFabric` создаёт животных по конфигу.
 
-5. **Разделение ответственности.** Животное (`AnimalBase`) отвечает за хранение текущей цели и проверку её достижения (`IsTargetReached`). Компонент движения (`IMovement`) отвечает за расчёт следующей цели (`GetNextTarget`) и выполнение перемещения (`SetPosition`). `SetPosition` возвращает `bool` — успешно ли началось движение, что предотвращает потерю цели при отклонённом запросе.
-
-**Чтобы добавить новое животное**, нужно: создать класс, унаследованный от `AnimalBase`; добавить конфиг в `GameConfigs`; добавить case в фабрику; создать префаб. Тип движения настраивается через конфиг — без изменения кода.
+5. **Матрица взаимодействий.** Правила столкновений между ролями (`Prey` vs `Prey`, `Predator` vs `Prey`, `Predator` vs `Predator`) вынесены в `AnimalCollisionResolver` в виде словаря делегатов, без цепочек `if-else`. При добавлении новой роли достаточно дописать пару записей в матрицу.
 
 ---
 
-## Структура проекта
+## Используемые технологии
 
-```text
-Assets/
-├── AddressableResources/      # Префабы животных и UI
-└── _Project/
-    └── Logic/
-        ├── Entities/          # Модели и сущности
-        │   ├── AIMovement/    # Компоненты движения (MovementBase, JumpMovement, LinearMovement)
-        │   ├── Animals/       # C# классы животных (AnimalBase, Frog, Snake)
-        │   ├── Configs/       # Конфиги (AnimalConfig, MovementConfig, JumpMovementConfig, LinearMovementConfig)
-        │   ├── AnimalReference.cs
-        │   ├── AnimalRole.cs
-        │   ├── AnimalTypeId.cs
-        │   ├── IAnimal.cs
-        │   ├── IMovement.cs
-        │   └── SpawnPositionProvider.cs
-        ├── Infrastructure/    # Точки входа, циклы игры и инсталлеры Zenject
-        │   ├── Bootstrapper.cs
-        │   ├── BootstrapInstaller.cs
-        │   ├── GameConfigs.cs
-        │   ├── GameCycleScript.cs
-        │   └── SceneInstaller.cs
-        ├── Services/          # Сервисы (фабрика, коллизии, реестр, ассеты)
-        │   ├── AnimalCollisionResolver.cs
-        │   ├── AnimalFabric.cs
-        │   ├── AnimalRegistry.cs
-        │   └── IAssets.cs
-        ├── UILogic/           # UI (Presenter, View, Factory)
-        │   ├── AnimalScorePresenter.cs
-        │   ├── AnimalViewCounter.cs
-        │   ├── TastyLabelView.cs
-        │   └── UIFactory.cs
-        └── Extensions/        # Методы расширения (CameraExtensions)
-```
+### Addressables
 
----
-
-## Ключевые компоненты
-
-### Животные (`AnimalBase`, `Frog`, `Snake`)
-
-Чистый C#, не наследуют `MonoBehaviour`, не зависят от Unity API (кроме `Vector3` через `IMovement.transform`). Хранят текущую цель (`_currentTarget` + флаг `_hasTarget`), проверяют её достижение (`IsTargetReached` сравнивает дистанцию с `NextPositionRadius` из конфига), запрашивают новую цель (`_movement.GetNextTarget()` + `_movement.SetPosition(nextTarget)`). Цель обновляется только если `SetPosition` вернул `true`.
-
-### Компоненты движения (`IMovement`, `MovementBase`, `JumpMovement`, `LinearMovement`)
-
-Создаются фабрикой (`AnimalFabric.CreateMovement()` делает `AddComponent<JumpMovement/LinearMovement>()` и вызывает `Initialize(config)`). Настраиваются через конфиг — все параметры (дистанция, интервал, высота, скорость) передаются через `Initialize(MovementConfig)`, никаких `[SerializeField]`. Рассчитывают следующую цель (`GetNextTarget()` содержит логику выбора направления и дистанции), выполняют перемещение (`SetPosition(target)` возвращает `bool`). Для `JumpMovement` — прыжок по параболе через UniTask. Для `LinearMovement` — `NavMeshAgent.SetDestination`.
-
-### Фабрика (`AnimalFabric`)
-
-Создаёт животных по конфигу (`SpawnByConfig(AnimalConfig, Vector3)`), создаёт компонент движения (`CreateMovement()` со `switch` по типу `MovementConfig`: `JumpMovementConfig → AddComponent<JumpMovement>()`, `LinearMovementConfig → AddComponent<LinearMovement>()`), инициализирует компонент (`movement.Initialize(config)`), создаёт C#-модель животного (`new Frog(id, role, movement, nextPositionRadius)` / `new Snake(...)`), регистрирует в реестре (`_registry.Register(animal)`), связывает с представлением (`AnimalReference.Initialize(animal)`).
-
-### Конфигурация (`GameConfigs`)
-
-Централизованные конфиги — все параметры животных и движения заданы в одном месте. Легко настраивать — изменить поведение можно без перекомпиляции, просто поменяв значения в `GameConfigs`. Примеры: `JumpMovementConfig` (`StepDistance`, `JumpInterval`, `JumpHeight`, `JumpDuration`, `MaxTurnAngle`), `LinearMovementConfig` (`MinTargetDistance`, `MaxTargetDistance`, `CenterReturnRadius`, `MaxArenaRadiusSqr`), `AnimalConfig` (`AnimalTypeId`, `Role`, `PrefabPath`, `MovementConfig`, `NextPositionRadius`).
-
-### Коллизии (`AnimalCollisionResolver`)
-
-Матрица взаимодействий — словарь `Dictionary<(AnimalRole, AnimalRole), Action<IAnimal, IAnimal>>`. Правила: `Prey vs Prey` — оба отскакивают (`Bounce()`), `Predator vs Prey` — хищник съедает жертву (`Die()` + `Eat()`), `Predator vs Predator` — случайный выживает (50/50), второй погибает. Расширение — для новой роли достаточно добавить записи в матрицу.
-
-### UI (`AnimalScorePresenter`, `AnimalViewCounter`, `TastyLabelView`)
-
-Счётчик погибших (`AnimalViewCounter` отображает количество погибших `Prey` и `Predator`), плашка «Tasty!» (`TastyLabelView` показывает над хищником после съедания жертвы), связь через события (`AnimalRegistry.OnAnimalDied` → `AnimalScorePresenter.OnDied` → `AnimalViewCounter.UpdatePreyCounter/UpdatePredatorCounter`).
+Префабы животных и UI загружаются через Addressables. Сервис `IAssets` (`AssetsProvider`) оборачивает `Addressables.InstantiateAsync` в UniTask, чтобы загрузку можно было ждать через `await` в фабрике и UI-коде. Пути к префабам хранятся в конфигах (`AnimalConfig.PrefabPath`, `UIFactory.UIRootPath`), так что адреса ресурсов не зашиты в логику.
 
 ### Zenject (`BootstrapInstaller`, `SceneInstaller`)
 
 DI-контейнер — все сервисы регистрируются в `BootstrapInstaller`. Точки входа — `Bootstrapper` инициализирует UI, `GameCycleScript` запускает цикл спавна. `SceneInstaller` регистрирует `SpawnPositionProvider` из сцены.
-
----
-
-## Как добавить новое животное
-
-1. Создайте класс в `Assets/_Project/Logic/Entities/Animals/`, унаследованный от `AnimalBase`:
-
-```csharp
-public class Bird : AnimalBase
-{
-    private Vector3 _currentTarget;
-    private bool _hasTarget;
-
-    public Bird(Guid id, AnimalRole role, IMovement movement, float nextPositionRadius)
-        : base(id, role, movement, nextPositionRadius)
-    {
-        _currentTarget = _movement.transform.position;
-        _hasTarget = false;
-    }
-
-    public override void Tick(float deltaTime)
-    {
-        if (!_hasTarget || IsTargetReached(_currentTarget))
-        {
-            Vector3 nextTarget = _movement.GetNextTarget();
-            if (_movement.SetPosition(nextTarget))
-            {
-                _currentTarget = nextTarget;
-                _hasTarget = true;
-            }
-        }
-    }
-}
-```
-
-2. Добавьте конфиг в `GameConfigs`:
-
-```csharp
-public static readonly AnimalConfig Bird = new(
-    AnimalTypeId.Bird,
-    AnimalRole.Prey,
-    "Prefabs/Animals/Bird.prefab",
-    JumpMovementConfig,
-    0.5f);
-```
-
-3. Добавьте case в `AnimalFabric.SpawnByConfig`:
-
-```csharp
-case AnimalTypeId.Bird:
-    animal = new Bird(id, config.Role, movement, config.NextPositionRadius);
-    break;
-```
-
-4. Создайте префаб в `AddressableResources/Prefabs/Animals/` с компонентом `AnimalReference` и `TastyLabelView`.
-
-5. Готово — животное появится в игре. Тип движения можно менять через конфиг без изменения кода.
-
----
-
-## Как добавить новый тип движения
-
-1. Создайте конфиг в `Assets/_Project/Logic/Entities/Configs/Movement/`:
-
-```csharp
-public class FlyMovementConfig : MovementConfig
-{
-    public float FlyHeight { get; }
-    public float FlySpeed { get; }
-}
-```
-
-2. Создайте компонент в `Assets/_Project/Logic/Entities/AIMovement/`:
-
-```csharp
-public class FlyMovement : MovementBase
-{
-    private FlyMovementConfig _config;
-
-    public override void Initialize(MovementConfig config)
-    {
-        base.Initialize(config);
-        _config = config as FlyMovementConfig;
-    }
-
-    public override Vector3 GetNextTarget() { /* ... */ }
-
-    public override bool SetPosition(Vector3 targetPosition) { /* ... */ }
-}
-```
-
-3. Добавьте case в `AnimalFabric.CreateMovement`:
-
-```csharp
-FlyMovementConfig => animalObject.AddComponent<FlyMovement>(),
-```
-
-4. Используйте в конфиге животного:
-
-```csharp
-public static readonly AnimalConfig Bird = new(
-    AnimalTypeId.Bird,
-    AnimalRole.Prey,
-    "Prefabs/Animals/Bird.prefab",
-    FlyMovementConfig,
-    0.5f);
-```
 
 ---
 
